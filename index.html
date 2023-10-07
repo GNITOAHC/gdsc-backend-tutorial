@@ -1,0 +1,76 @@
+<head>
+  <title>Photo storage</title>
+</head>
+<div id="app">
+  <h2>Pic storage</h2>
+
+  <form
+    action="http://localhost:8080/upload"
+    method="post"
+    enctype="multipart/form-data"
+    target="hiddenFrame"
+    onsubmit="window.location.reload();"
+  >
+    <label>Images: <input type="file" name="image" accept="image/*" /> </label>
+    <button type="submit">Submit</button>
+  </form>
+
+  <p v-for="photo in photos">
+    <button @click="deletePhoto(photo)" type="button">Delete</button>
+    <img :src="photo" />
+  </p>
+</div>
+
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"
+  integrity="sha512-emSwuKiMyYedRwflbZB2ghzX8Cw8fmNVgZ6yQNNXXagFzFOaQmbvQ1vmDkddHjm5AITcBIZfC7k4ShQSjgPAmQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+
+<script type="module">
+  import {
+    createApp,
+    ref,
+  } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+  createApp({
+    data() {
+      return {
+        title: 'Photo storage',
+        photos: [],
+      }
+    },
+    methods: {
+      async getPhotos() {
+        const res = await axios
+          .get('http://localhost:8080/get')
+          .then((res) => (this.photos = res.data))
+      },
+      async deletePhoto(displayReq) {
+        const deleteReq = displayReq.replace('display', 'delete')
+        const res = await axios.delete(deleteReq).then((res) => {
+          console.log(res)
+        })
+        window.location.reload()
+      },
+    },
+    mounted: function () {
+      this.getPhotos()
+    },
+  }).mount('#app')
+</script>
+
+<script>
+  function myFunc(term) {
+    console.log(term)
+  }
+</script>
+
+<iframe
+  name="hiddenFrame"
+  width="0"
+  height="0"
+  border="0"
+  style="display: none"
+></iframe>
